@@ -8,16 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Main extends JFrame implements GLEventListener, KeyListener {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-    private BoundingBox boundingBox;
+    private static BoundingBox boundingBox;
 
     public static void main(String[] args) {
+        //set bounding box to the initial bounds of clipping window.
+        boundingBox = new BoundingBox(200, 200, 300, 200);
         new Main();
     }
 
@@ -66,6 +67,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         drawPoints(randomPoints, gl2);
         drawLines(randomLines, gl2);
 
+        gl2.glFlush();
         //not yet - for the viewport of clipping window
         // gl2.glViewport(600,0,600,600);
 
@@ -123,7 +125,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
         for (Point2D p : points) {
             gl2.glBegin(GL2.GL_POINTS);
-            if (this.boundingBox.contains(p)) {
+            if (boundingBox.contains(p)) {
                 gl2.glColor3f(1.0f, 0.0f, 0.0f);
             }
             else {
@@ -136,20 +138,25 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
     private void drawLines(Line2D[] lines, GL2 gl2) {
         for (Line2D line : lines) {
-            gl2.glBegin(GL2.GL_LINES);
+            gl2.glEnable(GL2.GL_LINE_SMOOTH);
+            gl2.glEnable(GL2.GL_BLEND);
+            gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+            //change point size back to original size
+            gl2.glPointSize(1.0f);
+            gl2.glBegin(GL2.GL_POINTS);
             double dx = line.x2 - line.x1;
             double dy = line.y2 - line.y1;
-            for (int x = (int) line.x1; x<=line.x2; x++){
-                int y = (int)(line.y1 + dy * (x - line.x1) / dx);
-                if (this.boundingBox.contains(new Point2D(x, y))) {
+            for (double x = (int) line.x1; x<=line.x2; x++) {
+                double y = (line.y1 + dy * (x - line.x1) / dx);
+                if (boundingBox.contains(x, y)) {
                     gl2.glColor3f(1.0f, 0.0f, 0.0f);
                 }
                 else {
+                    //TODO: only hit this once
                     setRandomColor(gl2);
                 }
+                gl2.glVertex2f((float)x,(float)y);
             }
-            gl2.glVertex2i((int) line.x1, (int) line.y1);
-            gl2.glVertex2i((int) line.x2, (int) line.y2);
             gl2.glEnd();
         }
     }
@@ -172,8 +179,6 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         gl2.glVertex2i(100, 200);
         gl2.glVertex2i(500, 200);
         gl2.glEnd();
-        //set bounding box to the bounds of clipping window.
-        this.boundingBox = new BoundingBox(200, 200, 300, 200);
     }
 
     private void setRandomColor(GL2 gl2) {
