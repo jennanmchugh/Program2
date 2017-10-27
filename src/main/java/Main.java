@@ -1,7 +1,9 @@
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
+import com.sun.javafx.geom.Line2D;
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Point2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +11,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 
 public class Main extends JFrame implements GLEventListener, KeyListener {
     private static final long serialVersionUID = 1L;
@@ -98,7 +98,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         int numPoints = (int)(Math.random() * (maxNumPoints - min) + min);
         Point2D[] points = new Point2D[numPoints];
         for (int i=0; i<points.length; i++) {
-            points[i] = new Point((int)(Math.random() * (max-min) + min), (int)(Math.random() * (max-min) + min));
+            points[i] = new Point2D((int)(Math.random() * (max-min) + min), (int)(Math.random() * (max-min) + min));
         }
 
         return points;
@@ -112,7 +112,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         int numLines = (int)(Math.random() * (maxNumLines - min) + min);
         Line2D[] lines = new Line2D[numLines];
         for (int i=0; i<lines.length; i++) {
-            lines[i] = new Line2D.Double(Math.random()* (max-min) + min, Math.random()* (max-min) + min, Math.random()* (max-min) + min, Math.random()* (max-min) + min);
+            lines[i] = new Line2D((float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min);
         }
 
         return lines;
@@ -120,9 +120,10 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
     private void drawPoints(Point2D[] points, GL2 gl2) {
         gl2.glPointSize(5.0f);
+
         for (Point2D p : points) {
             gl2.glBegin(GL2.GL_POINTS);
-            if (this.boundingBox.contains(p.getX(), p.getY())) {
+            if (this.boundingBox.contains(p)) {
                 gl2.glColor3f(1.0f, 0.0f, 0.0f);
             }
             else {
@@ -136,19 +137,19 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
     private void drawLines(Line2D[] lines, GL2 gl2) {
         for (Line2D line : lines) {
             gl2.glBegin(GL2.GL_LINES);
-            double dx = line.getX2() - line.getX1();
-            double dy = line.getY2() - line.getY1();
-            for (int x = (int) line.getX1(); x<=line.getX2(); x++){
-                int y = (int)(line.getY1() + dy * (x - line.getX1()) / dx);
-                if (this.boundingBox.contains((double)x, (double)y)) {
+            double dx = line.x2 - line.x1;
+            double dy = line.y2 - line.y1;
+            for (int x = (int) line.x1; x<=line.x2; x++){
+                int y = (int)(line.y1 + dy * (x - line.x1) / dx);
+                if (this.boundingBox.contains(new Point2D(x, y))) {
                     gl2.glColor3f(1.0f, 0.0f, 0.0f);
                 }
                 else {
                     setRandomColor(gl2);
                 }
             }
-            gl2.glVertex2i((int) line.getX1(), (int) line.getY1());
-            gl2.glVertex2i((int) line.getX2(), (int) line.getY2());
+            gl2.glVertex2i((int) line.x1, (int) line.y1);
+            gl2.glVertex2i((int) line.x2, (int) line.y2);
             gl2.glEnd();
         }
     }
@@ -180,8 +181,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         float color1, color2, color3;
         int min = 0;
         int max = 1;
-        double maxRed = 0.4;
-        color1 = (float)(Math.random() * (maxRed-min) + min);
+        color1 = (float)(Math.random() * (0.5-min) + min);
         color2 = (float)(Math.random() * (max-min) + min);
         color3 = (float)(Math.random() * (max-min) + min);
         gl2.glColor3f(color1, color2, color3);
