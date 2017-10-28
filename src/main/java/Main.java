@@ -18,7 +18,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
     public static void main(String[] args) {
         //set bounding box to the initial bounds of clipping window.
-        boundingBox = new BoundingBox(200, 200, 300, 200);
+        boundingBox = new BoundingBox(100, 200, 400, 200);
         new Main();
     }
 
@@ -125,11 +125,9 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
         for (Point2D p : points) {
             gl2.glBegin(GL2.GL_POINTS);
+            setRandomColor(gl2);
             if (boundingBox.contains(p)) {
                 gl2.glColor3f(1.0f, 0.0f, 0.0f);
-            }
-            else {
-                setRandomColor(gl2);
             }
             gl2.glVertex2i((int)p.getX(), (int)p.getY());
             gl2.glEnd();
@@ -138,12 +136,11 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
 
     private void drawLines(Line2D[] lines, GL2 gl2) {
         for (Line2D line : lines) {
-            gl2.glEnable(GL2.GL_LINE_SMOOTH);
-            gl2.glEnable(GL2.GL_BLEND);
-            gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
             //change point size back to original size
-            gl2.glPointSize(1.0f);
+            gl2.glPointSize(2.0f);
+            float[] newColor = setRandomColor(gl2);
             gl2.glBegin(GL2.GL_POINTS);
+            //draw each point on the line
             double dx = line.x2 - line.x1;
             double dy = line.y2 - line.y1;
             for (double x = (int) line.x1; x<=line.x2; x++) {
@@ -152,8 +149,8 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
                     gl2.glColor3f(1.0f, 0.0f, 0.0f);
                 }
                 else {
-                    //TODO: only hit this once
-                    setRandomColor(gl2);
+                    //grab the random color that was first set
+                    gl2.glColor3f(newColor[0], newColor[1], newColor[2]);
                 }
                 gl2.glVertex2f((float)x,(float)y);
             }
@@ -162,6 +159,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
     }
 
     private void drawClippingWindow(GL2 gl2) {
+        //TODO: make this nicer
         //set the color to red
         gl2.glColor3f(1.0f, 0.0f, 0.0f);
         //draw the clipping window outline
@@ -181,8 +179,7 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         gl2.glEnd();
     }
 
-    private void setRandomColor(GL2 gl2) {
-        //TODO: random color can't be red! (this would be confusing if something is bordering the clipping window)
+    private float[] setRandomColor(GL2 gl2) {
         float color1, color2, color3;
         int min = 0;
         int max = 1;
@@ -190,5 +187,9 @@ public class Main extends JFrame implements GLEventListener, KeyListener {
         color2 = (float)(Math.random() * (max-min) + min);
         color3 = (float)(Math.random() * (max-min) + min);
         gl2.glColor3f(color1, color2, color3);
+        float[] colors = {color1, color2, color3};
+
+        return colors;
+
     }
 }

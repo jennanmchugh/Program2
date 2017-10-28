@@ -1,4 +1,6 @@
 build/
 out/
-.gradle/*
-.idea/*
+.iml
+.gradle/
+.idea/
+Program2.iml
