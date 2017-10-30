@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 
 
+/**
+ * Created by Jenna McHugh on 10/30/17.
+ */
 public class Program2 extends JFrame {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(Program2.class);

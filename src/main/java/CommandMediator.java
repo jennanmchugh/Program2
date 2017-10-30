@@ -17,8 +17,10 @@ public class CommandMediator {
     private static final int BBOX_MINY = 1;
     private static final int BBOX_MAXY = 570;
     private BoundingBox boundingBox = Program2.boundingBox;
-    private Point2D[] randomPoints = generateRandomPoints();
-    private Line2D[] randomLines = generateRandomLines();
+    private ExtendedPoint[] randomPoints = generateRandomPoints();
+    private ExtendedLine[] randomLines = generateRandomLines();
+    private int hits = 0;
+
     /**
      * Empty constructor
      */
@@ -77,11 +79,16 @@ public class CommandMediator {
 
     /**
      * Scales the clipping window by either enlarging or shrinking it by a fixed scale value
-     * @param sx float x value by which to scale x values
-     * @param sy float y value by which to scale y values
      */
-    public void scaleClippingWindowBy(float sx, float sy) {
-
+    public float[] scaleClippingWindow() {
+          Point2D fixedPoint = getBoundingBoxCenter(boundingBox);
+          float xf = (float)fixedPoint.getX();
+          float yf = (float)fixedPoint.getY();
+//        gl2.glTranslatef(xf, yf, 0.0f);
+//        gl2.glScalef(sx, sy, 0.0f);
+//        gl2.glTranslatef(-xf, -yf, 0.0f);
+//        boundingBox = new BoundingBox(boundingBox.getMinX() * sx, boundingBox.getMinY() * sy, Program2.MAX_BBOX_WIDTH, Program2.MAX_BBOX_HEIGHT);
+        return new float[]{xf, yf};
     }
 
     /**
@@ -90,15 +97,15 @@ public class CommandMediator {
      * Max x,y value for points = 600 (Max of viewport)
      * @return Point2D[] of randomly generated points
      */
-    private Point2D[] generateRandomPoints() {
+    private ExtendedPoint[] generateRandomPoints() {
         int min = 1;
         int max = 600;
         //limit the number of points to a maximum of 30
         int maxNumPoints = 30;
         int numPoints = (int)(Math.random() * (maxNumPoints - min) + min);
-        Point2D[] points = new Point2D[numPoints];
+        ExtendedPoint[] points = new ExtendedPoint[numPoints];
         for (int i=0; i<points.length; i++) {
-            points[i] = new Point2D((int)(Math.random() * (max-min) + min), (int)(Math.random() * (max-min) + min));
+            points[i] = new ExtendedPoint((int)(Math.random() * (max-min) + min), (int)(Math.random() * (max-min) + min));
         }
 
         return points;
@@ -110,15 +117,15 @@ public class CommandMediator {
      * Max x,y value for line points = 600 (Max. of viewport)
      * @return Line2D[] of randomly generated lines
      */
-    private Line2D[] generateRandomLines() {
+    private ExtendedLine[] generateRandomLines() {
         int min = 1;
         int max = 600;
         //limit the number of lines to a maximum of 35
         int maxNumLines = 15;
         int numLines = (int)(Math.random() * (maxNumLines - min) + min);
-        Line2D[] lines = new Line2D[numLines];
+        ExtendedLine[] lines = new ExtendedLine[numLines];
         for (int i=0; i<lines.length; i++) {
-            lines[i] = new Line2D((float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min);
+            lines[i] = new ExtendedLine((float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min);
         }
 
         return lines;
@@ -131,14 +138,22 @@ public class CommandMediator {
      * @param points The randomly generated (or user-selected) points to be drawn.
      * @param gl2
      */
-    private void drawPoints(Point2D[] points, GL2 gl2) {
+    private void drawPoints(ExtendedPoint[] points, GL2 gl2) {
         gl2.glPointSize(5.0f);
 
-        for (Point2D p : points) {
+        for (ExtendedPoint p : points) {
             gl2.glBegin(GL2.GL_POINTS);
-            setRandomColor(gl2);
             if (boundingBox.contains(p)) {
                 gl2.glColor3f(1.0f, 0.0f, 0.0f);
+            }
+            else {
+                if (p.getPointColor() != null) {
+                    gl2.glColor3f(p.getPointColor()[0], p.getPointColor()[1], p.getPointColor()[2]);
+                }
+                else {
+                    p.setPointColor(setRandomColor(gl2));
+                    gl2.glColor3f(p.getPointColor()[0], p.getPointColor()[1], p.getPointColor()[2]);
+                }
             }
             gl2.glVertex2i((int)p.getX(), (int)p.getY());
             gl2.glEnd();
@@ -152,11 +167,10 @@ public class CommandMediator {
      * @param lines The randomly generated (or user-selected) lines to be drawn.
      * @param gl2
      */
-    private void drawLines(Line2D[] lines, GL2 gl2) {
-        for (Line2D line : lines) {
+    private void drawLines(ExtendedLine[] lines, GL2 gl2) {
+        for (ExtendedLine line : lines) {
             //change point size back to original size
             gl2.glPointSize(2.0f);
-            float[] newColor = setRandomColor(gl2);
             gl2.glBegin(GL2.GL_POINTS);
             //draw each point on the line
             double dx = line.x2 - line.x1;
@@ -167,8 +181,13 @@ public class CommandMediator {
                     gl2.glColor3f(1.0f, 0.0f, 0.0f);
                 }
                 else {
-                    //grab the random color that was first set
-                    gl2.glColor3f(newColor[0], newColor[1], newColor[2]);
+                    if (line.getLineColor() != null) {
+                        gl2.glColor3f(line.getLineColor()[0], line.getLineColor()[1], line.getLineColor()[2]);
+                    }
+                    else {
+                        line.setLineColor(setRandomColor(gl2));
+                        gl2.glColor3f(line.getLineColor()[0], line.getLineColor()[1], line.getLineColor()[2]);
+                    }
                 }
                 gl2.glVertex2f((float)x,(float)y);
             }

@@ -42,7 +42,7 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent keyEvent) {
-        logger.debug("Key typed: " + String.valueOf(keyEvent.getKeyCode()));
+        logger.info("Key typed: " + String.valueOf(keyEvent.getKeyCode()));
 
         if (keyEvent.getKeyChar() == 'Q' || keyEvent.getKeyChar() == 'q') {
             //quit the program by using 'Q' key
@@ -79,12 +79,12 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_ADD) {
             logger.info(Messages.ADD_KEY_PRESSED);
-            this.commandMediator.scaleClippingWindowBy(1.1f, 1.1f);
+            float[] fixedPts = this.commandMediator.scaleClippingWindow();
             this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT) {
             logger.info(Messages.SUBTRACT_KEY_PRESSED);
-            this.commandMediator.scaleClippingWindowBy(-1.1f, -1.1f);
+            float[] fixedPts = this.commandMediator.scaleClippingWindow();
             this.refreshDisplay();
         }
 
