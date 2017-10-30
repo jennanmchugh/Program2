@@ -77,6 +77,17 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
             this.commandMediator.moveClippingWindowBy(2.0f, 0.0f);
             this.refreshDisplay();
         }
+        if (keyEvent.getKeyCode() == KeyEvent.VK_ADD) {
+            logger.info(Messages.ADD_KEY_PRESSED);
+            this.commandMediator.scaleClippingWindowBy(1.1f, 1.1f);
+            this.refreshDisplay();
+        }
+        if (keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+            logger.info(Messages.SUBTRACT_KEY_PRESSED);
+            this.commandMediator.scaleClippingWindowBy(-1.1f, -1.1f);
+            this.refreshDisplay();
+        }
+
     }
 
     @Override

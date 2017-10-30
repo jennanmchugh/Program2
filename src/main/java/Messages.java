@@ -5,4 +5,6 @@ final class Messages {
     static final String LEFT_KEY_PRESSED = "Left arrow key pressed";
     static final String QUIT_PROGRAM = "Program quit by user";
     static final String ROTATE_KEY_PRESSED = "'R' or 'r' key pressed";
+    static final String ADD_KEY_PRESSED = "Add key from number pad pressed";
+    static final String SUBTRACT_KEY_PRESSED = "Subtract key from number pad pressed";
 }

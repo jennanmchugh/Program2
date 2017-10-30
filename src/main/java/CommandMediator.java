@@ -76,6 +76,15 @@ public class CommandMediator {
     }
 
     /**
+     * Scales the clipping window by either enlarging or shrinking it by a fixed scale value
+     * @param sx float x value by which to scale x values
+     * @param sy float y value by which to scale y values
+     */
+    public void scaleClippingWindowBy(float sx, float sy) {
+
+    }
+
+    /**
      * This method will create a random number of points with the range being anywhere from 1-30 points
      * Min x,y value for points = 1
      * Max x,y value for points = 600 (Max of viewport)
