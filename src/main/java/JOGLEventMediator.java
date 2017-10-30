@@ -59,19 +59,23 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
     public void keyPressed(KeyEvent keyEvent) {
         if (keyEvent.getKeyCode() == KeyEvent.VK_UP) {
             logger.info(Messages.UP_KEY_PRESSED);
-            this.commandMediator.moveClippingWindowBy(0.0f, 0.02f);
+            this.commandMediator.moveClippingWindowBy(0.0f, 2.0f);
+            this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
             logger.info(Messages.DOWN_KEY_PRESSED);
-            this.commandMediator.moveClippingWindowBy(0.0f, -0.02f);
+            this.commandMediator.moveClippingWindowBy(0.0f, -2.0f);
+            this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT) {
             logger.info(Messages.LEFT_KEY_PRESSED);
-            this.commandMediator.moveClippingWindowBy(-0.02f, 0.0f);
+            this.commandMediator.moveClippingWindowBy(-2.0f, 0.0f);
+            this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_RIGHT) {
             logger.info(Messages.RIGHT_KEY_PRESSED);
-            this.commandMediator.moveClippingWindowBy(0.02f, 0.0f);
+            this.commandMediator.moveClippingWindowBy(2.0f, 0.0f);
+            this.refreshDisplay();
         }
     }
 

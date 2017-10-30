@@ -12,7 +12,13 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandMediator {
     private static final Logger logger = LoggerFactory.getLogger(CommandMediator.class);
+    private static final int BBOX_MINX = 1;
+    private static final int BBOX_MAXX = 600;
+    private static final int BBOX_MINY = 1;
+    private static final int BBOX_MAXY = 570;
     private BoundingBox boundingBox = Program2.boundingBox;
+    private Point2D[] randomPoints = generateRandomPoints();
+    private Line2D[] randomLines = generateRandomLines();
     /**
      * Empty constructor
      */
@@ -27,8 +33,6 @@ public class CommandMediator {
     public void draw(GLAutoDrawable glAutoDrawable) {
         GL2 gl2 = glAutoDrawable.getGL().getGL2();
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        Point2D[] randomPoints = generateRandomPoints();
-        Line2D[] randomLines = generateRandomLines();
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl2.glLoadIdentity();
         gl2.glViewport(0,0,600,600);
@@ -64,9 +68,11 @@ public class CommandMediator {
      * @param y float value by which the clipping window should move in the y direction
      */
     public void moveClippingWindowBy(float x, float y) {
-        Point2D bboxCenter = getBoundingBoxCenter(boundingBox);
-        boundingBox = new BoundingBox(boundingBox.getMinX() + x, boundingBox.getMinY() + y, Program2.MAX_BBOX_WIDTH, Program2.MAX_BBOX_HEIGHT);
-        logger.info("test");
+        if ((boundingBox.getMinX() + x >= BBOX_MINX) && (boundingBox.getMinY() + y >= BBOX_MINY)) {
+            if ((boundingBox.getMaxX() + x <= BBOX_MAXX) && (boundingBox.getMaxY() + y <= BBOX_MAXY)) {
+                boundingBox = new BoundingBox(boundingBox.getMinX() + x, boundingBox.getMinY() + y, Program2.MAX_BBOX_WIDTH, Program2.MAX_BBOX_HEIGHT);
+            }
+        }
     }
 
     /**
