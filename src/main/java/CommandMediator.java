@@ -4,14 +4,10 @@ import com.jogamp.opengl.glu.GLU;
 import com.sun.javafx.geom.Line2D;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The public methods in this class will be called by JOGLEventMediator when an event-based action is required.
  */
 public class CommandMediator {
-    private static final Logger logger = LoggerFactory.getLogger(CommandMediator.class);
     private static final int BBOX_MINX = 1;
     private static final int BBOX_MAXX = 600;
     private static final int BBOX_MINY = 1;
@@ -19,7 +15,6 @@ public class CommandMediator {
     private BoundingBox boundingBox = Program2.boundingBox;
     private ExtendedPoint[] randomPoints = generateRandomPoints();
     private ExtendedLine[] randomLines = generateRandomLines();
-    private int hits = 0;
 
     /**
      * Empty constructor
