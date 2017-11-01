@@ -1,3 +1,5 @@
+package utils;
+
 import com.sun.javafx.geom.Line2D;
 
 public class ExtendedLine extends Line2D {

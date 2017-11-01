@@ -4,6 +4,9 @@ import com.jogamp.opengl.glu.GLU;
 import com.sun.javafx.geom.Line2D;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
+import utils.ExtendedLine;
+import utils.ExtendedPoint;
+
 /**
  * The public methods in this class will be called by JOGLEventMediator when an event-based action is required.
  */

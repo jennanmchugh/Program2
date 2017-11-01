@@ -1,3 +1,5 @@
+package utils;
+
 public class ExtendedPoint extends javafx.geometry.Point2D {
     private float[] pointColor;
 
