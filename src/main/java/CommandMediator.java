@@ -39,12 +39,10 @@ public class CommandMediator {
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl2.glLoadIdentity();
-        gl2.glViewport(0,0,600,600);
+        gl2.glViewport(0,0,1200,600);
         drawClippingWindow(gl2);
         drawPoints(randomPoints, gl2);
         drawLines(randomLines, gl2);
-
-        //TODO: draw line/border in between viewports
         drawShapesInViewport(randomPoints, randomLines, gl2);
 
         gl2.glFlush();
