@@ -37,7 +37,7 @@ public class Program2 extends JFrame {
         this.getContentPane().add(glCanvas);
         this.setSize(MAX_WIDTH, MAX_HEIGHT);
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setResizable(false);
         glCanvas.requestFocusInWindow();

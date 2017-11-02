@@ -15,6 +15,10 @@ public class CommandMediator {
     private static final int BBOX_MAXX = 600;
     private static final int BBOX_MINY = 1;
     private static final int BBOX_MAXY = 570;
+    private static final double XvMin = 600;
+    private static final double XvMax = 1200;
+    private static final double YvMin = 0;
+    private static final double YvMax = 600;
     private BoundingBox boundingBox = Program2.boundingBox;
     private ExtendedPoint[] randomPoints = generateRandomPoints();
     private ExtendedLine[] randomLines = generateRandomLines();
@@ -41,7 +45,6 @@ public class CommandMediator {
         drawLines(randomLines, gl2);
 
         //TODO: draw line/border in between viewports
-        gl2.glViewport(600,0,600,600);
         drawShapesInViewport(randomPoints, randomLines, gl2);
 
         gl2.glFlush();
@@ -57,7 +60,7 @@ public class CommandMediator {
         gl2.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         gl2.glMatrixMode(GL2.GL_PROJECTION);
         GLU glu = new GLU();
-        glu.gluOrtho2D(0, 600, 0, 600);
+        glu.gluOrtho2D(0, 1200, 0, 600);
         gl2.glMatrixMode(GL2.GL_MODELVIEW);
     }
 
@@ -201,15 +204,25 @@ public class CommandMediator {
      * @param gl2
      */
     private void drawShapesInViewport(Point2D[] points, Line2D[] lines, GL2 gl2) {
-        //copy shapes from clipping window to viewport
-        //TODO: use clipping algorithm so this is scaled to viewport
         gl2.glPointSize(5.0f);
+
+        double XwMax = boundingBox.getMaxX();
+        double XwMin = boundingBox.getMinX();
+        double YwMax = boundingBox.getMaxY();
+        double YwMin = boundingBox.getMinY();
+
+        double sx = (XvMax - XvMin)/(XwMax - XwMin);
+        double sy = (YvMax - YvMin)/(YwMax - YwMin);
+        double tx = (XwMax*XvMin - XwMin*XvMax)/(XwMax - XwMin);
+        double ty = (YwMax*YvMin - YwMin*YvMax)/(YwMax - YwMin);
 
         for (Point2D p : points) {
             if (boundingBox.contains(p)) {
+                double xv = sx*p.getX() + tx;
+                double yv = sy*p.getY() + ty;
                 gl2.glBegin(GL2.GL_POINTS);
                 gl2.glColor3f(1.0f, 0.0f, 0.0f);
-                gl2.glVertex2i((int)p.getX(), (int)p.getY());
+                gl2.glVertex2f((float)xv, (float)yv);
                 gl2.glEnd();
             }
         }
@@ -224,9 +237,11 @@ public class CommandMediator {
             for (double x = (int) line.x1; x<=line.x2; x++) {
                 double y = (line.y1 + dy * (x - line.x1) / dx);
                 if (boundingBox.contains(x, y)) {
+                    double xv = sx*x + tx;
+                    double yv = sy*y + ty;
                     gl2.glBegin(GL2.GL_POINTS);
                     gl2.glColor3f(1.0f, 0.0f, 0.0f);
-                    gl2.glVertex2f((float)x,(float)y);
+                    gl2.glVertex2f((float)xv,(float)yv);
                     gl2.glEnd();
                 }
             }
