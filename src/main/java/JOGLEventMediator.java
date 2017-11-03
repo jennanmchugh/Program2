@@ -79,13 +79,13 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_ADD) {
             logger.info(Messages.ADD_KEY_PRESSED);
-            float[] fixedPts = this.commandMediator.scaleClippingWindow();
-            this.refreshDisplay();
+            //float[] fixedPts = this.commandMediator.scaleClippingWindow();
+            //this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT) {
             logger.info(Messages.SUBTRACT_KEY_PRESSED);
-            float[] fixedPts = this.commandMediator.scaleClippingWindow();
-            this.refreshDisplay();
+            //float[] fixedPts = this.commandMediator.scaleClippingWindow();
+            //this.refreshDisplay();
         }
 
     }

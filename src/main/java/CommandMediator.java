@@ -76,30 +76,22 @@ public class CommandMediator {
         }
     }
 
-    /**
+    /** TODO: implement this method
      * Scales the clipping window by either enlarging or shrinking it by a fixed scale value
      */
-    public float[] scaleClippingWindow() {
-          Point2D fixedPoint = getBoundingBoxCenter(boundingBox);
-          float xf = (float)fixedPoint.getX();
-          float yf = (float)fixedPoint.getY();
-//        gl2.glTranslatef(xf, yf, 0.0f);
-//        gl2.glScalef(sx, sy, 0.0f);
-//        gl2.glTranslatef(-xf, -yf, 0.0f);
-//        boundingBox = new BoundingBox(boundingBox.getMinX() * sx, boundingBox.getMinY() * sy, Program2.MAX_BBOX_WIDTH, Program2.MAX_BBOX_HEIGHT);
-        return new float[]{xf, yf};
+    public float[] scaleClippingWindow(float sx, float sy) {
+          return new float[]{sx, sy};
     }
 
     /**
      * This method will create a random number of points with the range being anywhere from 1-30 points
      * Min x,y value for points = 1
      * Max x,y value for points = 600 (Max of viewport)
-     * @return Point2D[] of randomly generated points
+     * @return ExtendedPoint[] of randomly generated points
      */
     private ExtendedPoint[] generateRandomPoints() {
         int min = 1;
         int max = 600;
-        //limit the number of points to a maximum of 30
         int maxNumPoints = 30;
         int numPoints = (int)(Math.random() * (maxNumPoints - min) + min);
         ExtendedPoint[] points = new ExtendedPoint[numPoints];
@@ -114,12 +106,11 @@ public class CommandMediator {
      * This method will create a random number of lines with the range being anywhere from 1-15 lines.
      * Min x,y value for line points = 1
      * Max x,y value for line points = 600 (Max. of viewport)
-     * @return Line2D[] of randomly generated lines
+     * @return ExtendedLine[] of randomly generated lines
      */
     private ExtendedLine[] generateRandomLines() {
         int min = 1;
         int max = 600;
-        //limit the number of lines to a maximum of 35
         int maxNumLines = 15;
         int numLines = (int)(Math.random() * (maxNumLines - min) + min);
         ExtendedLine[] lines = new ExtendedLine[numLines];
@@ -131,7 +122,7 @@ public class CommandMediator {
     }
 
     /**
-     * This method will render the points on the viewport.
+     * This method will render the points on the main viewport.
      * If a point is within the clipping window, that point will be red.
      * All other points will be a randomly generated color.
      * @param points The randomly generated (or user-selected) points to be drawn.
@@ -150,17 +141,17 @@ public class CommandMediator {
                     gl2.glColor3f(p.getPointColor()[0], p.getPointColor()[1], p.getPointColor()[2]);
                 }
                 else {
-                    p.setPointColor(setRandomColor(gl2));
+                    p.setPointColor(getRandomColor(gl2));
                     gl2.glColor3f(p.getPointColor()[0], p.getPointColor()[1], p.getPointColor()[2]);
                 }
             }
-            gl2.glVertex2i((int)p.getX(), (int)p.getY());
+            gl2.glVertex2f((float)p.getX(), (float)p.getY());
             gl2.glEnd();
         }
     }
 
     /**
-     * This method will render the lines on the viewport.
+     * This method will render the lines on the main viewport.
      * If any point on the line is within the clipping window, that point will be red.
      * All other points on the line will be a randomly generated color.
      * @param lines The randomly generated (or user-selected) lines to be drawn.
@@ -168,7 +159,6 @@ public class CommandMediator {
      */
     private void drawLines(ExtendedLine[] lines, GL2 gl2) {
         for (ExtendedLine line : lines) {
-            //change point size back to original size
             gl2.glPointSize(2.0f);
             gl2.glBegin(GL2.GL_POINTS);
             //draw each point on the line
@@ -184,7 +174,7 @@ public class CommandMediator {
                         gl2.glColor3f(line.getLineColor()[0], line.getLineColor()[1], line.getLineColor()[2]);
                     }
                     else {
-                        line.setLineColor(setRandomColor(gl2));
+                        line.setLineColor(getRandomColor(gl2));
                         gl2.glColor3f(line.getLineColor()[0], line.getLineColor()[1], line.getLineColor()[2]);
                     }
                 }
@@ -195,26 +185,26 @@ public class CommandMediator {
     }
 
     /**
-     * This method simply takes all the points and lines that are within the clipping window bounds and
-     * displays them in the clipping window's viewport.
+     * This method iterates through all the points contained within the clipping window
+     * and then scales the points to the viewport for a "zoom" effect.
      * @param points The randomly generated (or user-selected) points to be rendered.
      * @param lines The randomly generated (or user-selected) lines to be rendered.
      * @param gl2
      */
     private void drawShapesInViewport(Point2D[] points, Line2D[] lines, GL2 gl2) {
-        gl2.glPointSize(5.0f);
-
         double XwMax = boundingBox.getMaxX();
         double XwMin = boundingBox.getMinX();
         double YwMax = boundingBox.getMaxY();
         double YwMin = boundingBox.getMinY();
 
+        //set up equations for sx, sy, tx, ty - from Chapter 4 notes on mapping a window to a viewport.
         double sx = (XvMax - XvMin)/(XwMax - XwMin);
         double sy = (YvMax - YvMin)/(YwMax - YwMin);
         double tx = (XwMax*XvMin - XwMin*XvMax)/(XwMax - XwMin);
         double ty = (YwMax*YvMin - YwMin*YvMax)/(YwMax - YwMin);
 
         for (Point2D p : points) {
+            gl2.glPointSize(5.0f);
             if (boundingBox.contains(p)) {
                 double xv = sx*p.getX() + tx;
                 double yv = sy*p.getY() + ty;
@@ -247,7 +237,7 @@ public class CommandMediator {
     }
 
     /**
-     * This method will draw the red clipping window on the main viewport based on bounding box values.
+     * This method will draw the red-bordered clipping window on the main viewport based on bounding box values.
      * @param gl2
      */
     private void drawClippingWindow(GL2 gl2) {
@@ -273,7 +263,7 @@ public class CommandMediator {
      * @param gl2
      * @return float[] of red, green, blue values
      */
-    private float[] setRandomColor(GL2 gl2) {
+    private float[] getRandomColor(GL2 gl2) {
         float color1, color2, color3;
         int min = 0;
         int max = 1;
