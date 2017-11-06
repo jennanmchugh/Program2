@@ -1,11 +1,15 @@
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.awt.TextRenderer;
 import com.sun.javafx.geom.Line2D;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import utils.ExtendedLine;
 import utils.ExtendedPoint;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * The public methods in this class will be called by JOGLEventMediator when an event-based action is required.
@@ -22,6 +26,12 @@ public class CommandMediator {
     private BoundingBox boundingBox = Program2.boundingBox;
     private ExtendedPoint[] randomPoints = generateRandomPoints();
     private ExtendedLine[] randomLines = generateRandomLines();
+    private ExtendedPoint[] fixedPoints;
+    private ExtendedLine[] fixedLines;
+
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
 
     /**
      * Empty constructor
@@ -40,10 +50,20 @@ public class CommandMediator {
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl2.glLoadIdentity();
         gl2.glViewport(0,0,1200,600);
-        drawClippingWindow(gl2);
+
+//        if (Program2.numPoints > 0 && Program2.numLines > 0){
+//            fixedPoints = generateFixedPoints(Program2.numPoints);
+//            fixedLines = generateFixedLines(Program2.numLines);
+//            drawPoints(fixedPoints, gl2);
+//            drawLines(fixedLines, gl2);
+//            drawShapesInViewport(fixedPoints, fixedLines, gl2);
+//            drawClippingWindow(gl2);
+//        }
+
         drawPoints(randomPoints, gl2);
         drawLines(randomLines, gl2);
         drawShapesInViewport(randomPoints, randomLines, gl2);
+        drawClippingWindow(gl2);
 
         gl2.glFlush();
     }
@@ -79,8 +99,16 @@ public class CommandMediator {
     /** TODO: implement this method
      * Scales the clipping window by either enlarging or shrinking it by a fixed scale value
      */
-    public float[] scaleClippingWindow(float sx, float sy) {
-          return new float[]{sx, sy};
+    public void scaleClippingWindow(float sx, float sy) {
+          double newMinX = boundingBox.getMinX() * sx;
+          double newMaxX = boundingBox.getMaxX() * sx;
+          double newMinY = boundingBox.getMinY() * sy;
+          double newMaxY = boundingBox.getMaxY() * sy;
+        if ((boundingBox.getMinX() * sx >= BBOX_MINX) && (boundingBox.getMinY() * sy >= BBOX_MINY)) {
+            if ((boundingBox.getMaxX() * sx <= BBOX_MAXX) && (boundingBox.getMaxY() * sy <= BBOX_MAXY)) {
+                boundingBox = new BoundingBox(boundingBox.getMinX() * sx, boundingBox.getMinY() * sy, Program2.MAX_BBOX_WIDTH, Program2.MAX_BBOX_HEIGHT);
+            }
+        }
     }
 
     /**
@@ -103,6 +131,23 @@ public class CommandMediator {
     }
 
     /**
+     * This method will create a fixed number of points based on user input.
+     * Min x,y value for points = 1
+     * Max x,y value for points = 600 (Max of viewport)
+     * @return ExtendedPoint[] of randomly generated points
+     */
+    private ExtendedPoint[] generateFixedPoints(int pointSize) {
+        int min = 1;
+        int max = 600;
+        ExtendedPoint[] points = new ExtendedPoint[pointSize];
+        for (int i=0; i<points.length; i++) {
+            points[i] = new ExtendedPoint((int)(Math.random() * (max-min) + min), (int)(Math.random() * (max-min) + min));
+        }
+
+        return points;
+    }
+
+    /**
      * This method will create a random number of lines with the range being anywhere from 1-15 lines.
      * Min x,y value for line points = 1
      * Max x,y value for line points = 600 (Max. of viewport)
@@ -114,6 +159,23 @@ public class CommandMediator {
         int maxNumLines = 15;
         int numLines = (int)(Math.random() * (maxNumLines - min) + min);
         ExtendedLine[] lines = new ExtendedLine[numLines];
+        for (int i=0; i<lines.length; i++) {
+            lines[i] = new ExtendedLine((float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min);
+        }
+
+        return lines;
+    }
+
+    /**
+     * This method will create a fixed number of lines based on user input.
+     * Min x,y value for line points = 1
+     * Max x,y value for line points = 600 (Max. of viewport)
+     * @return ExtendedLine[] of randomly generated lines
+     */
+    private ExtendedLine[] generateFixedLines(int numOfLines) {
+        int min = 1;
+        int max = 600;
+        ExtendedLine[] lines = new ExtendedLine[numOfLines];
         for (int i=0; i<lines.length; i++) {
             lines[i] = new ExtendedLine((float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min, (float)Math.random()* (max-min) + min);
         }
@@ -280,7 +342,7 @@ public class CommandMediator {
      * @param bbox The bounding box of the clipping window
      * @return Point2D the center coordinate of the bounding box
      */
-    private Point2D getBoundingBoxCenter(BoundingBox bbox) {
+    public Point2D getBoundingBoxCenter(BoundingBox bbox) {
         return new Point2D((bbox.getMinX() + bbox.getMaxX())/2, (bbox.getMinY() + bbox.getMaxY())/2);
     }
 

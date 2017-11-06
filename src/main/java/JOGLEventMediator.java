@@ -79,13 +79,19 @@ public class JOGLEventMediator implements GLEventListener, KeyListener {
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_ADD) {
             logger.info(Messages.ADD_KEY_PRESSED);
-            //float[] fixedPts = this.commandMediator.scaleClippingWindow();
-            //this.refreshDisplay();
+            this.commandMediator.scaleClippingWindow(1.1f, 1.1f);
+//            Point2D centerPt = this.commandMediator.getBoundingBoxCenter(this.commandMediator.getBoundingBox());
+//            GL2 gl2 = glCanvas.getGL().getGL2();
+//            gl2.glMatrixMode(GL2.GL_PROJECTION);
+//            gl2.glTranslated(centerPt.getX(), centerPt.getY(), 1);
+//            gl2.glScaled(1.1, 1.1, 1);
+//            gl2.glTranslated(-centerPt.getX(), -centerPt.getY(), 1);
+//            gl2.glMatrixMode(GL2.GL_MODELVIEW);
+            this.refreshDisplay();
         }
         if (keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT) {
             logger.info(Messages.SUBTRACT_KEY_PRESSED);
-            //float[] fixedPts = this.commandMediator.scaleClippingWindow();
-            //this.refreshDisplay();
+            this.refreshDisplay();
         }
 
     }
